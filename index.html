@@ -98,6 +98,10 @@
   .form-sec .eyebrow{color:#c4a8ec}
   .msg{margin-top:16px;font-size:15px;display:none}
 
+  .socials{display:flex;justify-content:center;gap:12px;margin-bottom:16px}
+  .socials a{border:1px solid var(--line);background:var(--surface);border-radius:30px;padding:8px 18px;text-decoration:none;font-weight:600;font-size:14px}
+  .socials a:hover{border-color:var(--accent)}
+  .vk-link{display:inline-block;margin-top:20px;color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
   footer{padding:32px 0;font-size:13px;color:var(--muted);text-align:center}
   footer a{color:var(--accent)}
 
@@ -159,6 +163,7 @@
       <p>Я дипломированный специалист по системным расстановкам. За плечами — более 300 проведённых расстановок.</p>
       <p>Клиенты отмечают, что я работаю глубоко, но при этом бережно и внимательно. Для меня важно, чтобы вам было безопасно, и чтобы мы работали именно с тем, что для вас сейчас главное.</p>
       <p>Поэтому любая работа начинается с диагностики: сначала разбираемся в запросе, и только потом — расстановка.</p>
+      <a class="vk-link" href="https://vk.ru/club239101786" target="_blank" rel="noopener">Больше обо мне — в сообществе ВКонтакте →</a>
     </div>
   </div>
 </section>
@@ -232,7 +237,11 @@
 
 <footer>
   <div class="wrap">
-    Инна Бабенчук · системный расстановщик · <a href="https://t.me/InnaBabenchuk" target="_blank">@InnaBabenchuk</a><br>
+    <div class="socials">
+      <a href="https://t.me/InnaBabenchuk" target="_blank" rel="noopener">Telegram</a>
+      <a href="https://vk.ru/club239101786" target="_blank" rel="noopener">ВКонтакте</a>
+    </div>
+    Инна Бабенчук · системный расстановщик<br>
     Системная расстановка не является медицинской или психотерапевтической помощью.
   </div>
 </footer>

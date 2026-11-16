@@ -451,6 +451,19 @@
   }
 }
 
+
+.direct{margin-top:30px;padding-top:24px;border-top:1px solid rgba(255,255,255,.14);max-width:560px}
+.direct-title{font-size:14px;opacity:.85;margin:0 0 12px}
+.direct-btns{display:flex;flex-wrap:wrap;gap:10px}
+.dbtn{flex:1 1 140px;text-align:center;padding:12px 18px;border-radius:40px;border:1px solid rgba(255,255,255,.35);color:#fff;text-decoration:none;font-weight:600;font-size:15px;transition:background .2s}
+.dbtn:hover{background:rgba(255,255,255,.12)}
+.done{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(40,25,35,.7)}
+.done.on{display:flex}
+.done-box{background:var(--surface);color:var(--ink);max-width:420px;width:100%;border-radius:24px;padding:36px 28px 28px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+.done-check{width:64px;height:64px;margin:0 auto 16px;border-radius:50%;background:var(--accent);color:#fff;font-size:32px;line-height:64px}
+.done-box h3{font-size:28px;margin:0 0 10px}
+.done-box p{color:var(--muted);margin:0 0 22px;line-height:1.6}
+.done-box .btn{width:100%}
 </style>
 </head>
 <body>
@@ -588,9 +601,25 @@
 <button class="btn" id="sendBtn" type="submit">Записаться</button>
 <div aria-atomic="true" aria-live="polite" class="msg" id="msg" role="status"></div>
 </form>
+<div class="direct">
+<p class="direct-title">Или напишите мне напрямую:</p>
+<div class="direct-btns">
+<a class="dbtn" href="https://wa.me/79280390685?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%2C%20%D0%98%D0%BD%D0%BD%D0%B0%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%B7%D0%B0%D0%BF%D0%B8%D1%81%D0%B0%D1%82%D1%8C%D1%81%D1%8F%20%D0%BD%D0%B0%20%D0%B1%D0%B5%D1%81%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%83%D1%8E%20%D0%B4%D0%B8%D0%B0%D0%B3%D0%BD%D0%BE%D1%81%D1%82%D0%B8%D0%BA%D1%83" target="_blank" rel="noopener">WhatsApp</a>
+<a class="dbtn" href="https://max.ru/u/f9LHodD0cOKcfjbrY5HHOB81J0n1HWT98KFsG3e9wUZXbR2kKuOZwxS7w9g" target="_blank" rel="noopener">MAX</a>
+<a class="dbtn" href="https://t.me/InnaBabenchuk" target="_blank" rel="noopener">Telegram</a>
+</div>
+</div>
 </div>
 </section>
 </main>
+<div class="done" id="done" role="dialog" aria-modal="true" aria-labelledby="doneTitle" aria-hidden="true">
+<div class="done-box">
+<div class="done-check" aria-hidden="true">✓</div>
+<h3 id="doneTitle">Заявка отправлена</h3>
+<p>Спасибо! Я скоро напишу вам в выбранный мессенджер и предложу время встречи.</p>
+<button class="btn" id="doneHome" type="button">На главную</button>
+</div>
+</div>
 <div aria-hidden="true" aria-label="Увеличенный отзыв" aria-modal="true" class="lb" id="lb" role="dialog">
 <button aria-label="Закрыть увеличенный отзыв" class="lb-close" id="lbClose" type="button">×</button>
 <img alt="Увеличенный скриншот отзыва" decoding="async" height="308" width="682"/>
@@ -654,6 +683,25 @@
   // Сюда вставим адрес Google Apps Script на шаге 4
   const GAS_URL = "https://script.google.com/macros/s/AKfycbzg-crPZ1nRBfvabsddS7tglg2-nRZb5iXjm5rTsCEV37jNCx9LcKhNaD67AoDP8x8fVQ/exec";
 
+  const done = document.getElementById('done');
+  let doneTimer = null;
+  function goHome() {
+    done.classList.remove('on');
+    done.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    clearTimeout(doneTimer);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  function showDone() {
+    done.classList.add('on');
+    done.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('doneHome').focus();
+    doneTimer = setTimeout(goHome, 8000);
+  }
+  document.getElementById('doneHome').addEventListener('click', goHome);
+  done.addEventListener('click', ev => { if (ev.target === done) goHome(); });
+
   document.getElementById('leadForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = document.getElementById('sendBtn');
@@ -669,8 +717,10 @@
       if (!GAS_URL) throw new Error('no url');
       await fetch(GAS_URL, { method: 'POST', mode: 'no-cors', body: data });
       e.target.reset();
-      msg.style.color = '#d9c6f2';
-      msg.textContent = 'Спасибо! Ваш запрос отправлен. Я скоро напишу вам в выбранный мессенджер.';
+      msg.style.display = 'none';
+      showDone();
+      btn.disabled = false; btn.textContent = 'Записаться';
+      return;
     } catch (err) {
       msg.style.color = '#f0a39a';
       msg.textContent = 'Не получилось отправить. Напишите мне напрямую в Telegram: @InnaBabenchuk';

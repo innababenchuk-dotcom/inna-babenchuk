@@ -597,7 +597,7 @@ input.bad{border-color:#ff8f80 !important;box-shadow:0 0 0 2px rgba(255,143,128,
 <input autocomplete="name" id="name" name="name" required="" type="text"/>
 <label for="messenger">Куда мне написать</label>
 <select id="messenger" name="messenger" required=""><option disabled="" selected="" value="">Выберите мессенджер</option><option value="Telegram">Telegram</option><option value="MAX">MAX</option><option value="WhatsApp">WhatsApp</option></select>
-<label for="contact">Ник или номер телефона</label>
+<label for="contact" id="contactLabel">Ник или номер телефона</label>
 <input autocapitalize="none" autocomplete="off" id="contact" name="contact" placeholder="Сначала выберите мессенджер" required="" spellcheck="false" type="text"/>
 <div class="field-hint" id="contactHint">Telegram — @ник или телефон. MAX и WhatsApp — номер телефона.</div>
 <div class="field-err" id="contactErr" role="alert"></div>
@@ -700,9 +700,16 @@ input.bad{border-color:#ff8f80 !important;box-shadow:0 0 0 2px rgba(255,143,128,
     MAX: ['+7 900 123-45-67', 'Укажите номер телефона, к которому привязан MAX.'],
     WhatsApp: ['+7 900 123-45-67', 'Укажите номер телефона, к которому привязан WhatsApp.']
   };
+  const contactLabel = document.getElementById('contactLabel');
+  const LABELS = { Telegram: 'Ваш ник в Telegram или телефон', MAX: 'Ваш номер телефона (MAX)', WhatsApp: 'Ваш номер телефона (WhatsApp)' };
   msgr.addEventListener('change', () => {
     const h = HINTS[msgr.value];
-    if (h) { contactInput.placeholder = h[0]; contactHint.textContent = h[1]; }
+    if (h) { contactInput.placeholder = h[0]; contactHint.textContent = h[1]; contactLabel.textContent = LABELS[msgr.value]; }
+    // Телефонная клавиатура для MAX и WhatsApp, обычная — для Telegram
+    contactInput.setAttribute('inputmode', msgr.value === 'Telegram' ? 'text' : 'tel');
+    // Если ввели ник, а выбрали MAX/WhatsApp — очищаем поле, чтобы не путать
+    if (msgr.value !== 'Telegram' && /[A-Za-z@]/.test(contactInput.value)) contactInput.value = '';
+    contactErr.classList.remove('on'); contactInput.classList.remove('bad');
     if (contactInput.value) checkContact();
   });
   function normPhone(v) {
@@ -730,7 +737,7 @@ input.bad{border-color:#ff8f80 !important;box-shadow:0 0 0 2px rgba(255,143,128,
       if (!ok) err = 'Нужен ник Telegram (латиница, от 5 символов, например @anna_ivanova) или номер телефона (+7 900 123-45-67).';
     } else {
       ok = normPhone(v);
-      if (!ok) err = 'Нужен номер телефона в формате +7 900 123-45-67.';
+      if (!ok) err = /[A-Za-z@]/.test(v) ? 'Для ' + msgr.value + ' нужен номер телефона. Ник подходит только для Telegram.' : 'Нужен номер телефона в формате +7 900 123-45-67.';
     }
     contactErr.textContent = err;
     contactErr.classList.toggle('on', !!err);
